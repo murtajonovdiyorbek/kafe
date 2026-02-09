@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Кухонный Дисплей</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a1a;
+            color: white;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        }
+
+        .header h1 {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .current-time {
+            font-size: 24px;
+            opacity: 0.9;
+        }
+
+        .display-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            height: calc(100vh - 150px);
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .section {
+            border-radius: 20px;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .preparing-section {
+            background: linear-gradient(135deg, #ff4444 0%, #cc0000 100%);
+        }
+
+        .ready-section {
+            background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
+        }
+
+        .section-header {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            text-align: center;
+            padding-bottom: 20px;
+            border-bottom: 3px solid rgba(255,255,255,0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .order-card {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 2px solid rgba(255,255,255,0.3);
+            transition: all 0.3s;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .order-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .order-code {
+            font-size: 72px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .order-items {
+            margin: 20px 0;
+        }
+
+        .order-item {
+            padding: 12px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .item-name {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .item-quantity {
+            font-size: 24px;
+            font-weight: bold;
+            background: rgba(255,255,255,0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+        }
+
+        .order-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid rgba(255,255,255,0.2);
+        }
+
+        .order-time {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+
+        .order-total {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .action-btn {
+            width: 100%;
+            padding: 15px;
+            font-size: 20px;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: all 0.3s;
+        }
+
+        .ready-btn {
+            background: rgba(255,255,255,0.9);
+            color: #cc0000;
+        }
+
+        .ready-btn:hover {
+            background: white;
+            transform: scale(1.02);
+        }
+
+        .complete-btn {
+            background: rgba(255,255,255,0.9);
+            color: #2e7d32;
+        }
+
+        .complete-btn:hover {
+            background: white;
+            transform: scale(1.02);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            opacity: 0.6;
+            font-size: 24px;
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: space-around;
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.6;
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.3);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255,255,255,0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🍳 Кухонный Дисплей</h1>
+        <div class="current-time" id="currentTime"></div>
+    </div>
+
+    <div class="display-container">
+        <!-- Preparing Section (Red) -->
+        <div class="section preparing-section">
+            <div class="section-header">
+                <span>🔥</span>
+                <span>В процессе приготовления</span>
+            </div>
+            <div class="stats-bar">
+                <div class="stat">
+                    <div class="stat-value" id="preparingCount">0</div>
+                    <div class="stat-label">Заказов</div>
+                </div>
+            </div>
+            <div id="preparingOrders"></div>
+        </div>
+
+        <!-- Ready Section (Green) -->
+        <div class="section ready-section">
+            <div class="section-header">
+                <span>✓</span>
+                <span>Готово к выдаче</span>
+            </div>
+            <div class="stats-bar">
+                <div class="stat">
+                    <div class="stat-value" id="readyCount">0</div>
+                    <div class="stat-label">Заказов</div>
+                </div>
+            </div>
+            <div id="readyOrders"></div>
+        </div>
+    </div>
+
+    <script>
+        // Update current time
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('ru-RU', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            const dateString = now.toLocaleDateString('ru-RU', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            document.getElementById('currentTime').textContent = `${dateString} • ${timeString}`;
+        }
+
+        // Format time
+        function formatTime(timestamp) {
+            const date = new Date(timestamp);
+            return date.toLocaleTimeString('ru-RU', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        // Get time elapsed
+        function getTimeElapsed(timestamp) {
+            const now = new Date();
+            const orderTime = new Date(timestamp);
+            const diff = Math.floor((now - orderTime) / 1000 / 60);
+            return diff;
+        }
+
+        // Render Orders
+        function renderOrders() {
+            const orders = JSON.parse(localStorage.getItem('kitchenOrders') || '[]');
+            const preparingOrders = orders.filter(o => o.status === 'preparing');
+            const readyOrders = orders.filter(o => o.status === 'ready');
+
+            // Update counts
+            document.getElementById('preparingCount').textContent = preparingOrders.length;
+            document.getElementById('readyCount').textContent = readyOrders.length;
+
+            // Render preparing orders
+            const preparingContainer = document.getElementById('preparingOrders');
+            if (preparingOrders.length === 0) {
+                preparingContainer.innerHTML = '<div class="empty-state">Нет заказов в процессе</div>';
+            } else {
+                preparingContainer.innerHTML = preparingOrders.map(order => {
+                    const elapsed = getTimeElapsed(order.timestamp);
+                    const isPulse = elapsed > 10 ? 'pulse' : '';
+
+                    return `
+                        <div class="order-card ${isPulse}">
+                            <div class="order-code">${order.code}</div>
+                            <div class="order-items">
+                                ${order.items.map(item => `
+                                    <div class="order-item">
+                                        <span class="item-name">${item.name}</span>
+                                        <span class="item-quantity">×${item.quantity}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <div class="order-footer">
+                                <div class="order-time">
+                                    ${formatTime(order.timestamp)}
+                                    ${elapsed > 0 ? `<br><small>(${elapsed} мин назад)</small>` : ''}
+                                </div>
+                                <div class="order-total">${order.total.toLocaleString()} сом</div>
+                            </div>
+                            <button class="action-btn ready-btn" onclick="markAsReady('${order.code}')">
+                                ✓ Готово
+                            </button>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            // Render ready orders
+            const readyContainer = document.getElementById('readyOrders');
+            if (readyOrders.length === 0) {
+                readyContainer.innerHTML = '<div class="empty-state">Нет готовых заказов</div>';
+            } else {
+                readyContainer.innerHTML = readyOrders.map(order => {
+                    const elapsed = getTimeElapsed(order.readyTime || order.timestamp);
+
+                    return `
+                        <div class="order-card">
+                            <div class="order-code">${order.code}</div>
+                            <div class="order-items">
+                                ${order.items.map(item => `
+                                    <div class="order-item">
+                                        <span class="item-name">${item.name}</span>
+                                        <span class="item-quantity">×${item.quantity}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <div class="order-footer">
+                                <div class="order-time">
+                                    Готов: ${formatTime(order.readyTime || order.timestamp)}
+                                </div>
+                                <div class="order-total">${order.total.toLocaleString()} сом</div>
+                            </div>
+                            <button class="action-btn complete-btn" onclick="completeOrder('${order.code}')">
+                                Выдан
+                            </button>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+
+        // Mark as Ready
+        function markAsReady(orderCode) {
+            const orders = JSON.parse(localStorage.getItem('kitchenOrders') || '[]');
+            const order = orders.find(o => o.code === orderCode);
+
+            if (order) {
+                order.status = 'ready';
+                order.readyTime = new Date().toISOString();
+                localStorage.setItem('kitchenOrders', JSON.stringify(orders));
+                renderOrders();
+
+                // Play sound
+                playNotification();
+            }
+        }
+
+        // Complete Order
+        function completeOrder(orderCode) {
+            const orders = JSON.parse(localStorage.getItem('kitchenOrders') || '[]');
+            const filteredOrders = orders.filter(o => o.code !== orderCode);
+            localStorage.setItem('kitchenOrders', JSON.stringify(filteredOrders));
+            renderOrders();
+        }
+
+        // Play notification sound
+        function playNotification() {
+            const context = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = context.createOscillator();
+            const gainNode = context.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(context.destination);
+
+            oscillator.frequency.value = 800;
+            oscillator.type = 'sine';
+
+            gainNode.gain.setValueAtTime(0.3, context.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 0.5);
+
+            oscillator.start(context.currentTime);
+            oscillator.stop(context.currentTime + 0.5);
+        }
+
+        // Initialize
+        updateTime();
+        setInterval(updateTime, 1000);
+        renderOrders();
+        setInterval(renderOrders, 2000); // Auto-refresh every 2 seconds
+
+        // Listen for storage changes (for real-time updates)
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'kitchenOrders') {
+                renderOrders();
+            }
+        });
+    </script>
+</body>
+</html>
